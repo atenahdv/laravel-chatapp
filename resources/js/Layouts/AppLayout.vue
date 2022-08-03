@@ -45,6 +45,9 @@ const logout = () => {
                                 <Link :href="route('dashboard')">
                                     <JetApplicationMark class="block h-9 w-auto" />
                                 </Link>
+                                <Link :href="route('chat')">
+                                    <JetApplicationMark class="block h-9 w-auto" />
+                                </Link>
                             </div>
 
                             <!-- Navigation Links -->
@@ -52,7 +55,11 @@ const logout = () => {
                                 <JetNavLink :href="route('dashboard')" :active="route().current('dashboard')">
                                     Dashboard
                                 </JetNavLink>
+                                  <JetNavLink :href="route('chat')" :active="route().current('chat')">
+                                    Chat
+                                </JetNavLink>
                             </div>
+
                         </div>
 
                         <div class="hidden sm:flex sm:items-center sm:ml-6">
@@ -211,7 +218,14 @@ const logout = () => {
                         <JetResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
                             Dashboard
                         </JetResponsiveNavLink>
+
+                        <JetResponsiveNavLink :href="route('chat')" :active="route().current('chat')">
+                            Chat
+                        </JetResponsiveNavLink>
                     </div>
+                    
+                        
+                   
 
                     <!-- Responsive Settings Options -->
                     <div class="pt-4 pb-1 border-t border-gray-200">

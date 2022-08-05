@@ -1,55 +1,4 @@
-<script >
-import AppLayout from '@/Layouts/AppLayout.vue';
-import MessageContainer from './messageContainer.vue';
-import InputMessage from './inputMessage.vue';
-import axios from 'axios';
-import ChatRoomSelection from './chatRoomSelection.vue';
 
-export default{
-
-components:{
-    AppLayout,
-    MessageContainer,
-    InputMessage,
-    ChatRoomSelection
-},
-data: function(){
-  return{
-    ChatRooms : [],
-    currentRoom : [],
-    messages : []
-  }
-},
-methods:{
-  getRooms(){
-    axios.get('/chat/rooms')
-    .then( response => {
-      this.ChatRooms = response.data;
-      this.setRoom(response.data[0]) ;
-    })
-    .catch( error => {
-      console.log(error);
-    })
-  },
-  setRoom(room){
-      this.currentRoom = room;
-      this.getMessages(); 
-    },
-    getMessages(){
-      axios.get('/chat/room/' + this.currentRoom.id + '/messages')
-      .then(response => {
-        this.messages = response.data;
-      })
-      .catch( error => {
-      console.log(error);
-    })
-    }
-},
-created(){
-  this.getRooms();
-}
-}
-</script>
 <template>
     <AppLayout title="Dashboard">
         <template #header>
@@ -78,3 +27,79 @@ created(){
         </div>
     </AppLayout>
 </template>
+
+<script >
+import AppLayout from '@/Layouts/AppLayout.vue';
+import MessageContainer from './messageContainer.vue';
+import InputMessage from './inputMessage.vue';
+import axios from 'axios';
+import ChatRoomSelection from './chatRoomSelection.vue';
+
+export default{
+
+components:{
+    AppLayout,
+    MessageContainer,
+    InputMessage,
+    ChatRoomSelection
+},
+data: function(){
+  return{
+    ChatRooms : [],
+    currentRoom : [],
+    messages : []
+  }
+},
+watch:{
+  currentRoom(val , oldVal){
+    if( oldVal.id ){
+      this.disconnect( oldVal );
+    }
+    this.connect();
+  }
+
+},
+methods:{
+  connect(){
+    if( this.currentRoom.id ){
+      let vm = this;
+      this.getMessages();         
+      window.Echo.private("chat." + this.currentRoom.id)
+      .listen('NewChatMessage' , e =>{
+        vm.getMessages();
+      });
+    }
+  },
+  disconnect( room ){
+    window.Echo.leave("chat." + room.id );
+  },
+
+  getRooms(){
+    axios.get('/chat/rooms')
+    .then( response => {
+      this.ChatRooms = response.data;
+      this.setRoom(response.data[0]) ;
+    })
+    .catch( error => {
+      console.log(error);
+    })
+  },
+  setRoom(room){
+      this.currentRoom = room;
+       
+    },
+    getMessages(){
+      axios.get('/chat/room/' + this.currentRoom.id + '/messages')
+      .then(response => {
+        this.messages = response.data;
+      })
+      .catch( error => {
+      console.log(error);
+    })
+    }
+},
+created(){
+  this.getRooms();
+}
+}
+</script>
